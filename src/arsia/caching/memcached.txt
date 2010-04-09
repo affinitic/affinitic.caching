@@ -1,0 +1,191 @@
+This doctest requires memcache to be up and running and empty.
+
+Let's play a bit with caching and dependencies::
+
+    >>> def cache_key(fun, self, first, second):
+    ...     return (first, second)
+
+    >>> from arsia.cerise.core.memcached import cache
+    >>> from arsia.cerise.core.tests.test_doctest import B
+    >>> class A(object):
+    ...     def __init__(self):
+    ...         self.calculationCount = 0
+    ...
+    ...     @cache(cache_key, dependencies=['Einstein'])
+    ...     def sum(self, a, b):
+    ...         self.calculationCount += 1
+    ...         return a+b
+    ...
+    ...     @cache(cache_key, dependencies=['Einstein'])
+    ...     def sumObj(self, a, b):
+    ...         self.calculationCount += 1
+    ...         bObj = B()
+    ...         bObj.value = a+b
+    ...         return bObj
+
+
+    >>> a = A()
+    >>> a.sum(1, 2)
+    3
+    >>> a.calculationCount
+    1
+    >>> a.sum(1, 2)
+    3
+    >>> a.calculationCount
+    1
+
+
+    >>> from zope.component import getUtility
+    >>> from lovely.memcached.interfaces import IMemcachedClient
+    >>> memclient = getUtility(IMemcachedClient)
+    >>> memclient2 = getUtility(IMemcachedClient)
+    >>> stats = memclient.getStatistics()[0][1]
+    >>> stats.get('total_items')
+    '2'
+
+Invalidate via dependencies:
+
+    >>> memclient.invalidate(raw=True, dependencies=['Einstein'])
+    >>> a.sum(1, 2)
+    3
+    >>> a.calculationCount
+    2
+    >>> a.sum(1, 2)
+    3
+    >>> a.calculationCount
+    2
+
+Calling an event has the same effect:
+
+    >>> from zope.event import notify
+    >>> from lovely.memcached.event import InvalidateCacheEvent
+    >>> notify(InvalidateCacheEvent(raw=True, dependencies=['Einstein']))
+    >>> a.sum(1, 2)
+    3
+    >>> a.calculationCount
+    3
+
+What if we want to cache objects ?
+
+    >>> obj = a.sumObj(1, 2)
+    >>> a.calculationCount
+    4
+    >>> obj.value
+    3
+    >>> obj = a.sumObj(1, 2)
+    >>> obj.value
+    3
+    >>> a.calculationCount
+    4
+
+With SA ?
+
+    >>> from sqlalchemy import (MetaData, Column, Table, Integer, String,
+    ...                         create_engine)
+    >>> from sqlalchemy.orm import mapper, sessionmaker
+    >>> metadata = MetaData()
+    >>> engine = create_engine('sqlite:///:memory:')
+    >>> users = Table('testusers', metadata,
+    ...     Column('id', Integer, primary_key=True),
+    ...     Column('name', String(40)),
+    ...     Column('fullname', String(100)),
+    ... )
+
+    >>> metadata.create_all(engine)
+    >>> from arsia.cerise.core.tests.test_doctest import User
+    >>> mapper(User, users)
+    <sqlalchemy.orm.mapper.Mapper object ...>
+
+    >>> user1 = User()
+    >>> user1.id = 1
+    >>> user1.name = 'Einstein'
+    >>> user1.fullname = 'Albert Einstein'
+    >>> session = sessionmaker(bind=engine, autoflush=False,
+    ...                        transactional=False)()
+    >>> session.save(user1)
+    >>> session.flush()
+    >>> def cache_key(fun, self):
+    ...     return ()
+
+    >>> queryCount = 0
+    >>> class QueryMaker(object):
+    ...
+    ...     @cache(cache_key, dependencies=['Einstein'])
+    ...     def getAllUsers(self):
+    ...         global queryCount
+    ...         queryCount += 1
+    ...         return session.query(User).all()
+
+    >>> queryMaker = QueryMaker()
+    >>> users = queryMaker.getAllUsers()
+    >>> users
+    [<arsia.cerise.core.tests.test_doctest.User object at ...>]
+    >>> users[0].fullname
+    'Albert Einstein'
+    >>> print queryCount
+    1
+
+    >>> queryMaker = QueryMaker()
+    >>> users = queryMaker.getAllUsers()
+    >>> print queryCount
+    1
+    >>> users
+    [<arsia.cerise.core.tests.test_doctest.User object at ...>]
+    >>> albert = users[0]
+    >>> albert.fullname = 'Alberto Tomba'
+    >>> session.save_or_update(albert)
+    Traceback (most recent call last):
+    ...
+    InvalidRequestError: Could not update instance 'User@...', identity key (<class 'arsia.cerise.core.tests.test_doctest.User'>, (1,), None); a different instance with the same identity key already exists in this session.
+    >>> session.close()
+
+    >>> session = sessionmaker(bind=engine, autoflush=False,
+    ...                        transactional=False)()
+    >>> session.save_or_update(albert)
+    >>> print queryCount
+    1
+
+We have updated the object, notify invalidators::
+
+    >>> notify(InvalidateCacheEvent(raw=True, dependencies=['Einstein']))
+    >>> queryMaker = QueryMaker()
+    >>> users = queryMaker.getAllUsers()
+    >>> users
+    [<arsia.cerise.core.tests.test_doctest.User object at ...>]
+    >>> print queryCount
+    2
+    >>> print users[0].fullname
+    Alberto Tomba
+
+Caching with timeout, here 3 seconds timeout (default is 1 day)::
+
+    >>> def cache_key(fun, self, first, second):
+    ...     return (first, second)
+    >>> class A(object):
+    ...     def __init__(self):
+    ...         self.calculationCount = 0
+    ...
+    ...     @cache(cache_key, dependencies=['Einstein'], lifetime=3)
+    ...     def sum(self, a, b):
+    ...         self.calculationCount += 1
+    ...         return a+b
+
+    >>> a = A()
+    >>> a.sum(1, 2)
+    3
+    >>> a.calculationCount
+    1
+    >>> a.sum(1, 2)
+    3
+    >>> a.calculationCount
+    1
+    >>> from time import sleep
+    >>> sleep(4)
+    >>> a.sum(1, 2)
+    3
+    >>> a.calculationCount
+    2
+    >>> a.sum(1, 2)
+    3
+    >>> a.calculationCount
+    2
