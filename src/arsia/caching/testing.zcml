@@ -1,0 +1,14 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+           i18n_domain="cerise">
+
+  <include package="zope.app.component" file="meta.zcml" />
+  <include package="zope.component" file="meta.zcml" />
+  <include package="zope.component" file="configure.zcml" />
+
+  <include package="zope.app.component" file="meta.zcml"/>
+  <include package="grokcore.component" file="meta.zcml"/>
+  <include package="arsia.caching"/>
+
+  <includeOverrides package="arsia.caching" file="overrides.zcml"/>
+
+</configure>

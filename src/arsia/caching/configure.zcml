@@ -1,0 +1,15 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+           i18n_domain="arsia.caching">
+
+  <exclude package="lovely.memcached.browser"/>
+  <exclude package="zope.app.cache"/>
+
+  <include package="z3c.autoinclude" file="meta.zcml" />
+  <includeDependencies package="." />
+
+  <utility provides="lovely.memcached.interfaces.IMemcachedClient"
+           factory=".memcached.memcachedClient" />
+
+  <subscriber handler="lovely.memcached.event.invalidateCache"/>
+
+</configure>
