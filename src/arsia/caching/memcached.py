@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-arsia.cerise.core
+arsia.caching
 
 Licensed under the GPL license, see LICENCE.txt for more details.
 Copyright by Affinitic sprl

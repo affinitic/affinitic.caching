@@ -21,8 +21,19 @@ setup(name='arsia.caching',
       namespace_packages=['arsia'],
       include_package_data=True,
       zip_safe=False,
+      extras_require=dict(
+            test=['zope.testing', 'zope.app.testing',
+                  'zope.app.component']),
       install_requires=[
+          'z3c.autoinclude',
           'setuptools',
+          'sqlalchemy',
+          'grokcore.component',
+          'zope.security',
+          'zope.configuration',
+          'zope.ramcache',
+          'zope.event',
+          'zope.component',
+          'zope.app.cache',
           'plone.memoize',
-          'lovely.memcached'
-      ])
+          'lovely.memcached'])

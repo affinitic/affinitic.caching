@@ -16,7 +16,7 @@ from zope.configuration.xmlconfig import XMLConfig
 
 optionflags = doctest.REPORT_ONLY_FIRST_FAILURE | doctest.ELLIPSIS
 
-import arsia.cerise.core
+import arsia.caching
 
 
 class B(object):
@@ -29,7 +29,7 @@ class User(object):
 
 def configurationSetUp(test):
     setUp()
-    XMLConfig('testing.zcml', arsia.cerise.core)()
+    XMLConfig('testing.zcml', arsia.caching)()
 
 
 def configurationTearDown(test):
@@ -44,7 +44,7 @@ def test_suite():
     tests = (
         doctest.DocFileSuite('memcached.txt',
                              optionflags=OPTIONFLAGS,
-                             package="arsia.cerise.core",
+                             package="arsia.caching",
                              setUp=configurationSetUp,
                              tearDown=configurationTearDown),
         )
