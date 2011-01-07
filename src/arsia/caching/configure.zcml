@@ -2,6 +2,7 @@
            i18n_domain="arsia.caching">
 
   <exclude package="lovely.memcached.browser"/>
+  <exclude package="zope.security"/>
   <exclude package="zope.app.cache"/>
 
   <include package="z3c.autoinclude" file="meta.zcml" />
