@@ -1,7 +1,7 @@
 <configure xmlns="http://namespaces.zope.org/zope"
            i18n_domain="arsia.caching">
 
-  <exclude package="lovely.memcached.browser"/>
+  <exclude package="lovely.memcached"/>
   <exclude package="zope.security"/>
   <exclude package="zope.app.cache"/>
 
