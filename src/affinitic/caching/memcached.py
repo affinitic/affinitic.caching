@@ -14,7 +14,10 @@ from zope.ramcache.interfaces.ram import IRAMCache
 from lovely.memcached.interfaces import IMemcachedClient
 from lovely.memcached.utility import MemcachedClient
 from plone.memoize.ram import (AbstractDict, store_in_cache, RAMCacheAdapter)
-from sqlalchemy.engine.base import RowProxy
+try:
+   from sqlalchemy.engine.base import RowProxy
+except:
+   from sqlalchemy.engine import RowProxy
 from plone.memoize import volatile
 import md5
 
