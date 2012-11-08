@@ -3,9 +3,9 @@ import os
 
 version = '0.3dev'
 
-setup(name='arsia.caching',
+setup(name='affinitic.caching',
       version=version,
-      description="Caching function for ARSIA projects",
+      description="Caching function for affinitic projects",
       long_description=open("README.txt").read() + "\n" +
                        open(os.path.join("docs", "HISTORY.txt")).read(),
       classifiers=[
@@ -18,7 +18,7 @@ setup(name='arsia.caching',
       license='GPL',
       packages=find_packages('src', exclude=['ez_setup']),
       package_dir={'': 'src'},
-      namespace_packages=['arsia'],
+      namespace_packages=['affinitic'],
       include_package_data=True,
       zip_safe=False,
       extras_require=dict(

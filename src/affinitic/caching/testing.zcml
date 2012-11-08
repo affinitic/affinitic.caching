@@ -7,8 +7,8 @@
 
   <include package="zope.app.component" file="meta.zcml"/>
   <include package="grokcore.component" file="meta.zcml"/>
-  <include package="arsia.caching"/>
+  <include package="affinitic.caching"/>
 
-  <includeOverrides package="arsia.caching" file="overrides.zcml"/>
+  <includeOverrides package="affinitic.caching" file="overrides.zcml"/>
 
 </configure>

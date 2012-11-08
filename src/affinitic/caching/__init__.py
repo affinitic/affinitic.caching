@@ -1,1 +1,1 @@
-from arsia.caching.memcached import cache
+from affinitic.caching.memcached import cache

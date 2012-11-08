@@ -5,8 +5,8 @@ Let's play a bit with caching and dependencies::
     >>> def cache_key(fun, self, first, second):
     ...     return (first, second)
 
-    >>> from arsia.caching.memcached import cache
-    >>> from arsia.caching.tests.test_doctest import B
+    >>> from affinitic.caching.memcached import cache
+    >>> from affinitic.caching.tests.test_doctest import B
     >>> class A(object):
     ...     def __init__(self):
     ...         self.calculationCount = 0
@@ -92,7 +92,7 @@ With SA ?
     ... )
 
     >>> metadata.create_all(engine)
-    >>> from arsia.caching.tests.test_doctest import User
+    >>> from affinitic.caching.tests.test_doctest import User
     >>> m = mapper(User, users)
     >>> user1 = User()
     >>> user1.id = 1
@@ -116,7 +116,7 @@ With SA ?
     >>> queryMaker = QueryMaker()
     >>> users = queryMaker.getAllUsers()
     >>> users
-    [<arsia.caching.tests.test_doctest.User object at ...>]
+    [<affinitic.caching.tests.test_doctest.User object at ...>]
     >>> users[0].fullname
     'Albert Einstein'
     >>> print queryCount
@@ -127,13 +127,13 @@ With SA ?
     >>> print queryCount
     1
     >>> users
-    [<arsia.caching.tests.test_doctest.User object at ...>]
+    [<affinitic.caching.tests.test_doctest.User object at ...>]
     >>> albert = users[0]
     >>> albert.fullname = 'Alberto Tomba'
     >>> session.save_or_update(albert)
     Traceback (most recent call last):
     ...
-    InvalidRequestError: Could not update instance 'User@...', identity key (<class 'arsia.caching.tests.test_doctest.User'>, (1,), None); a different instance with the same identity key already exists in this session.
+    InvalidRequestError: Could not update instance 'User@...', identity key (<class 'affinitic.caching.tests.test_doctest.User'>, (1,), None); a different instance with the same identity key already exists in this session.
     >>> session.close()
 
     >>> session = sessionmaker(bind=engine, autoflush=False,
@@ -148,7 +148,7 @@ We have updated the object, notify invalidators::
     >>> queryMaker = QueryMaker()
     >>> users = queryMaker.getAllUsers()
     >>> users
-    [<arsia.caching.tests.test_doctest.User object at ...>]
+    [<affinitic.caching.tests.test_doctest.User object at ...>]
     >>> print queryCount
     2
     >>> print users[0].fullname

@@ -1,5 +1,5 @@
 <configure xmlns="http://namespaces.zope.org/zope"
-           i18n_domain="arsia.caching">
+           i18n_domain="affinitic.caching">
 
    <utility component=".memcached.choose_cache"
             provides="plone.memoize.interfaces.ICacheChooser"/>

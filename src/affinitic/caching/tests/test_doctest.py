@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-arsia.cerise.core
+affinitic.cerise.core
 
 Licensed under the GPL license, see LICENCE.txt for more details.
 Copyright by Affinitic sprl
@@ -16,7 +16,7 @@ from zope.configuration.xmlconfig import XMLConfig
 
 optionflags = doctest.REPORT_ONLY_FIRST_FAILURE | doctest.ELLIPSIS
 
-import arsia.caching
+import affinitic.caching
 
 
 class B(object):
@@ -29,7 +29,7 @@ class User(object):
 
 def configurationSetUp(test):
     setUp()
-    XMLConfig('testing.zcml', arsia.caching)()
+    XMLConfig('testing.zcml', affinitic.caching)()
 
 
 def configurationTearDown(test):
@@ -44,7 +44,7 @@ def test_suite():
     tests = (
         doctest.DocFileSuite('memcached.txt',
                              optionflags=OPTIONFLAGS,
-                             package="arsia.caching",
+                             package="affinitic.caching",
                              setUp=configurationSetUp,
                              tearDown=configurationTearDown),
         )
