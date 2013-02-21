@@ -4,4 +4,7 @@
    <utility component=".memcached.choose_cache"
             provides="plone.memoize.interfaces.ICacheChooser"/>
 
+   <utility component=".memcached.invalidate_key"
+            provides=".interfaces.IInvalidateKey" />
+
 </configure>

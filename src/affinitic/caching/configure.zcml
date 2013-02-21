@@ -10,6 +10,9 @@
 
   <utility provides="lovely.memcached.interfaces.IMemcachedClient"
            factory=".memcached.memcachedClient" />
+  
+  <utility component=".memoize.invalidate_key"
+           provides=".interfaces.IInvalidateKey" />
 
   <subscriber handler="lovely.memcached.event.invalidateCache"/>
 
