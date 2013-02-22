@@ -1,10 +1,22 @@
 Changelog
 =========
 
-0.3 (unreleased)
+0.4 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Optimizes the caching functions.
+
+- Adds two decorators who clears the cache before or after a function.
+
+- Adds a function to clear a specific cache.
+
+- Adds a function to invalidate a specific key in the cache.
+
+
+0.3 (2013-02-13)
+----------------
+
+- Change name from arsia.caching to affinitic.caching
 
 
 0.2 (2011-02-22)
