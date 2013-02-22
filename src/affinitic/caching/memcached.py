@@ -8,18 +8,24 @@ Copyright by Affinitic sprl
 $Id: event.py 67630 2006-04-27 00:54:03Z jfroche $
 """
 import cPickle
+import md5
 import os
-from zope.component import queryUtility
-from zope.ramcache.interfaces.ram import IRAMCache
+try:
+    from sqlalchemy.engine.base import RowProxy
+except:
+    from sqlalchemy.engine import RowProxy
+
+from lovely.memcached.event import InvalidateCacheEvent
 from lovely.memcached.interfaces import IMemcachedClient
 from lovely.memcached.utility import MemcachedClient
-from plone.memoize.ram import (AbstractDict, store_in_cache, RAMCacheAdapter)
-try:
-   from sqlalchemy.engine.base import RowProxy
-except:
-   from sqlalchemy.engine import RowProxy
+
+from zope import event
+from zope.component import queryUtility
+from zope.ramcache.interfaces.ram import IRAMCache
+
 from plone.memoize import volatile
-import md5
+from plone.memoize.interfaces import ICacheChooser
+from plone.memoize.ram import (AbstractDict, store_in_cache, RAMCacheAdapter)
 
 DEPENDENCIES = {}
 
@@ -115,3 +121,15 @@ def cache(get_key, dependencies=None, lifetime=None):
             return cached_value
         return replacement
     return decorator
+
+
+def invalidate_key(funcname, key):
+    client = queryUtility(IMemcachedClient)
+    cache = queryUtility(ICacheChooser)(key)
+    if client is not None:
+        invalidateEvent = InvalidateCacheEvent(key=cache._make_key(key),
+                                               raw=True)
+        event.notify(invalidateEvent)
+    else:
+        key = dict(key=cache._make_key(key))
+        cache.ramcache.invalidate(funcname, key=key)
