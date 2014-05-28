@@ -15,6 +15,7 @@ import pkg_resources
 try:
     pkg_resources.get_distribution('sqlalchemy')
 except pkg_resources.DistributionNotFound:
+
     class RowProxy(object):
         pass
 else:  # we have sqlalchemy
@@ -102,13 +103,16 @@ def choose_cache(fun_name):
 _marker = object()
 
 
-def cache(get_key, dependencies=None, lifetime=None):
+def cache(get_key, dependencies=None, get_dependencies=None, lifetime=None):
 
     def decorator(fun):
 
         def replacement(*args, **kwargs):
-            if dependencies is not None:
-                for d in dependencies:
+            if dependencies is not None or get_dependencies is not None:
+                deps = dependencies
+                if get_dependencies is not None:
+                    deps = get_dependencies(fun, *args, **kwargs)
+                for d in deps:
                     deps = DEPENDENCIES.get(d, [])
                     method = "%s.%s" % (fun.__module__, fun.__name__)
                     if method not in deps:
