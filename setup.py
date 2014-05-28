@@ -23,11 +23,11 @@ setup(name='affinitic.caching',
       zip_safe=False,
       extras_require=dict(
             test=['zope.testing', 'zope.app.testing',
+                  'sqlalchemy',
                   'zope.app.component']),
       install_requires=[
           'z3c.autoinclude',
           'setuptools',
-          'sqlalchemy',
           'grokcore.component',
           'zope.security',
           'zope.configuration',

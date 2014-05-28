@@ -10,10 +10,19 @@ $Id: event.py 67630 2006-04-27 00:54:03Z jfroche $
 import cPickle
 import md5
 import os
+import pkg_resources
+
 try:
-    from sqlalchemy.engine.base import RowProxy
-except:
-    from sqlalchemy.engine import RowProxy
+    pkg_resources.get_distribution('sqlalchemy')
+except pkg_resources.DistributionNotFound:
+    class RowProxy(object):
+        pass
+else:  # we have sqlalchemy
+    try:
+        from sqlalchemy.engine.base import RowProxy
+    except ImportError, e:
+        from sqlalchemy.engine import RowProxy
+
 
 from lovely.memcached.event import InvalidateCacheEvent
 from lovely.memcached.interfaces import IMemcachedClient
