@@ -13,3 +13,13 @@ from zope.component import Interface
 class IInvalidateKey(Interface):
     """
     """
+
+
+class IMemcachedDefaultNameSpace(Interface):
+    """
+    """
+
+    def __str__():
+        """
+        return the current memcached default namespace
+        """

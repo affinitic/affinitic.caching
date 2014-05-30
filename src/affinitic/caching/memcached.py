@@ -37,14 +37,42 @@ from plone.memoize import volatile
 from plone.memoize.interfaces import ICacheChooser
 from plone.memoize.ram import (AbstractDict, store_in_cache, RAMCacheAdapter)
 
+from affinitic.caching.interfaces import IMemcachedDefaultNameSpace
+
 DEPENDENCIES = {}
 
 
+class MemcachedClientWithNameSpace(MemcachedClient):
+    """
+    Delegate the namespace definition to a utility
+    Cache the namespace calculation
+    """
+    _defaultNS = None
+
+    @property
+    def defaultNS(self):
+        if self._defaultNS is not None:
+            return self._defaultNS
+        defaultNameSpace = queryUtility(IMemcachedDefaultNameSpace)
+        if defaultNameSpace is not None:
+            defaultNameSpace = defaultNameSpace()
+            if defaultNameSpace is not None:
+                self._defaultNS = defaultNameSpace
+
+    def _getNS(self, ns, raw):
+        defaultNameSpace = self.defaultNS or 'defaultNS'
+        if not ns and defaultNameSpace:
+            if raw:
+                ns = str(defaultNameSpace)
+            else:
+                ns = defaultNameSpace
+        return ns or None
+
+
 def memcachedClient():
-    servers = os.environ.get(
-        "MEMCACHE_SERVER", "127.0.0.1:11211").split(",")
-    return MemcachedClient(servers, defaultNS=u'cerise',
-                           defaultAge=86400)
+    servers = os.environ.get("MEMCACHE_SERVER", "127.0.0.1:11211").split(",")
+    return MemcachedClientWithNameSpace(servers, defaultNS=None,
+                                        defaultAge=86400)
 
 
 class MemcacheAdapter(AbstractDict):
