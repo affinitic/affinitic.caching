@@ -1,2 +1,5 @@
 recursive-include docs *
 recursive-include src *
+include *.py
+include buildout.cfg
+include versions.cfg
