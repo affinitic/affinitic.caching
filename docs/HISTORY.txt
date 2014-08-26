@@ -4,7 +4,11 @@ Changelog
 0.5 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Move memcache utility to overrides zcml
+
+- Delegate the namespace definition to a utility and cache the namespace calculation
+
+- Make sqlalchemy a soft dependency
 
 
 0.4 (2013-02-22)
