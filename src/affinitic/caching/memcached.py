@@ -139,6 +139,7 @@ def cache(get_key, dependencies=None, get_dependencies=None, lifetime=None):
                 key = get_key(fun, *args, **kwargs)
             except volatile.DontCache:
                 return fun(*args, **kwargs)
+            key = str(key)
 
             if dependencies is not None or get_dependencies is not None:
                 deps = dependencies
