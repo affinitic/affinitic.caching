@@ -83,8 +83,7 @@ class MemcacheAdapter(AbstractDict):
         dependencies = []
         if globalkey:
             for k, v in DEPENDENCIES.items():
-                if globalkey in v:
-                    dependencies.append(k)
+                dependencies.append(k)
 
         self.dependencies = dependencies
 
@@ -136,21 +135,20 @@ def cache(get_key, dependencies=None, get_dependencies=None, lifetime=None):
     def decorator(fun):
 
         def replacement(*args, **kwargs):
+            try:
+                key = get_key(fun, *args, **kwargs)
+            except volatile.DontCache:
+                return fun(*args, **kwargs)
+
             if dependencies is not None or get_dependencies is not None:
                 deps = dependencies
                 if get_dependencies is not None:
                     deps = get_dependencies(fun, *args, **kwargs)
                 for d in deps:
-                    deps = DEPENDENCIES.get(d, [])
-                    method = "%s.%s" % (fun.__module__, fun.__name__)
-                    if method not in deps:
-                        deps.append(method)
-                        DEPENDENCIES[d] = deps
-            try:
-                key = get_key(fun, *args, **kwargs)
-            except volatile.DontCache:
-                return fun(*args, **kwargs)
-            key = '%s.%s:%s' % (fun.__module__, fun.__name__, key)
+                    new_deps = DEPENDENCIES.get(d, [])
+                    if key not in new_deps:
+                        new_deps.append(key)
+                        DEPENDENCIES[d] = new_deps
             cache = store_in_cache(fun, *args, **kwargs)
             cached_value = cache.get(key, _marker)
             if cached_value is _marker:
@@ -174,3 +172,18 @@ def invalidate_key(funcname, key):
     else:
         key = dict(key=cache._make_key(key))
         cache.ramcache.invalidate(funcname, key=key)
+
+
+def invalidate_dependencies(dependencies):
+    """
+    Invalidate all caches linked to dependencies
+    """
+    client = queryUtility(IMemcachedClient)
+    # memcached
+    if client is not None:
+        invalidateEvent = InvalidateCacheEvent(raw=True,
+                                               dependencies=dependencies)
+        event.notify(invalidateEvent)
+    # ramcache
+    else:
+        raise NotImplementedError
