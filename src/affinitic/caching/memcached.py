@@ -141,6 +141,11 @@ def cache(get_key, dependencies=None, get_dependencies=None, lifetime=None):
                 return fun(*args, **kwargs)
             key = str(key)
 
+            # Do not cache when not using memcache with dependencies
+            memcache_client = queryUtility(IMemcachedClient)
+            if (dependencies is not None or get_dependencies is not None) and not memcache_client:
+                return fun(*args, **kwargs)
+
             if dependencies is not None or get_dependencies is not None:
                 deps = dependencies
                 if get_dependencies is not None:
@@ -187,4 +192,5 @@ def invalidate_dependencies(dependencies):
         event.notify(invalidateEvent)
     # ramcache
     else:
-        raise NotImplementedError
+        # Cannot invalidate dependencies with ramcache
+        pass
