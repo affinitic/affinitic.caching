@@ -102,9 +102,9 @@ class MemcacheAdapter(AbstractDict):
             cached_value = cPickle.dumps(value)
         except TypeError:
             if isinstance(value, list) and isinstance(value[0], RowProxy):
-                value = [dict(d) for d in value]
+                value = [RowProxyDict(d) for d in value]
             elif isinstance(value, RowProxy):
-                value = dict(value)
+                value = RowProxyDict(value)
             else:
                 raise
             cached_value = cPickle.dumps(value)
@@ -194,3 +194,20 @@ def invalidate_dependencies(dependencies):
     else:
         # Cannot invalidate dependencies with ramcache
         pass
+
+
+class RowProxyDict(dict):
+    """
+    dict allowing to get values via __getattr__
+    """
+
+    def __getattr__(self, item):
+        """Maps values to attributes.
+        Only called if there *isn't* an attribute with this name
+        """
+        if self.has_key(item):
+            return self.__getitem__(item)
+        elif self.has_key(item.upper()):
+            return self.__getitem__(item.upper())
+        else:
+            raise AttributeError(item)
