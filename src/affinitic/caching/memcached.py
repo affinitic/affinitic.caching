@@ -25,10 +25,12 @@ else:  # we have sqlalchemy
         from sqlalchemy.engine import RowProxy
 
 
+from lovely.memcached.event import invalidateCache
 from lovely.memcached.event import InvalidateCacheEvent
 from lovely.memcached.interfaces import IMemcachedClient
 from lovely.memcached.utility import MemcachedClient
 
+from zope import component
 from zope import event
 from zope.component import queryUtility
 from zope.ramcache.interfaces.ram import IRAMCache
@@ -185,6 +187,7 @@ def invalidate_dependencies(dependencies):
     Invalidate all caches linked to dependencies
     """
     client = queryUtility(IMemcachedClient)
+    component.provideHandler(invalidateCache)
     # memcached
     if client is not None:
         invalidateEvent = InvalidateCacheEvent(raw=True,
