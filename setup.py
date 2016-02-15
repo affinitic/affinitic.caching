@@ -21,6 +21,7 @@ setup(name='affinitic.caching',
       extras_require=dict(test=['zope.testing',
                                 'zope.app.testing',
                                 'sqlalchemy',
+                                'unittest2',
                                 'zope.app.component']),
       install_requires=[
           'z3c.autoinclude',
