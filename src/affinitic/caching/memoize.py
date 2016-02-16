@@ -33,7 +33,15 @@ def cache_for_functions(func, lifetime=86400):
         return cache
 
     def get_key(func, *args, **kwargs):
-        return (args, frozenset(kwargs.items()), )
+        items = []
+        for item in kwargs.items():
+            elements = []
+            for i in item:
+                if isinstance(i, list):
+                    i = tuple(i)
+                elements.append(i)
+            items.append(tuple(elements))
+        return (args, frozenset(items), )
 
     def cache(get_key):
         return volatile.cache(get_key, get_cache=store_in_cache)
@@ -59,8 +67,16 @@ def cache_for_instances(func, lifetime=86400):
         return cache
 
     def get_key(func, *args, **kwargs):
+        items = []
+        for item in kwargs.items():
+            elements = []
+            for i in item:
+                if isinstance(i, list):
+                    i = tuple(i)
+                elements.append(i)
+            items.append(tuple(elements))
         # remove 'self' attribute received from instance method
-        return (args[1:], frozenset(kwargs.items()), )
+        return (args[1:], frozenset(items), )
 
     def cache(get_key):
         return volatile.cache(get_key, get_cache=store_in_cache)
