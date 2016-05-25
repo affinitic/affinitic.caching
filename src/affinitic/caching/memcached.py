@@ -41,8 +41,6 @@ from plone.memoize.ram import (AbstractDict, store_in_cache, RAMCacheAdapter)
 
 from affinitic.caching.interfaces import IMemcachedDefaultNameSpace
 
-DEPENDENCIES = {}
-
 
 class MemcachedClientWithNameSpace(MemcachedClient):
     """
@@ -82,13 +80,6 @@ class MemcacheAdapter(AbstractDict):
     def __init__(self, client, globalkey=''):
         self.client = client
 
-        dependencies = []
-        if globalkey:
-            for k, v in DEPENDENCIES.items():
-                dependencies.append(k)
-
-        self.dependencies = dependencies
-
     def _make_key(self, source):
         return md5.new(source).hexdigest()
 
@@ -111,13 +102,27 @@ class MemcacheAdapter(AbstractDict):
                 raise
             cached_value = cPickle.dumps(value)
         self.client.set(cached_value, self._make_key(key), raw=True,
-                        dependencies=self.dependencies)
+                        dependencies=[])
 
-    def setWithLifetime(self, key, value, lifetime):
+    def set(self, key, value, dependencies=[]):
+        try:
+            cached_value = cPickle.dumps(value)
+        except TypeError:
+            if isinstance(value, list) and isinstance(value[0], RowProxy):
+                value = [RowProxyDict(d) for d in value]
+            elif isinstance(value, RowProxy):
+                value = RowProxyDict(value)
+            else:
+                raise
+            cached_value = cPickle.dumps(value)
+        self.client.set(cached_value, self._make_key(key), raw=True,
+                        dependencies=dependencies)
+
+    def setWithLifetime(self, key, value, lifetime, dependencies=[]):
         cached_value = cPickle.dumps(value)
         self.client.set(cached_value, self._make_key(key), raw=True,
                         lifetime=lifetime,
-                        dependencies=self.dependencies)
+                        dependencies=dependencies)
 
 
 def choose_cache(fun_name):
@@ -152,19 +157,15 @@ def cache(get_key, dependencies=None, get_dependencies=None, lifetime=None):
                 deps = dependencies
                 if get_dependencies is not None:
                     deps = get_dependencies(fun, *args, **kwargs)
-                for d in deps:
-                    new_deps = DEPENDENCIES.get(d, [])
-                    if key not in new_deps:
-                        new_deps.append(key)
-                        DEPENDENCIES[d] = new_deps
             cache = store_in_cache(fun, *args, **kwargs)
             cached_value = cache.get(key, _marker)
             if cached_value is _marker:
                 if lifetime is None:
-                    cached_value = cache[key] = fun(*args, **kwargs)
+                    cached_value = fun(*args, **kwargs)
+                    cache.set(key, cached_value, deps)
                 else:
                     cached_value = fun(*args, **kwargs)
-                    cache.setWithLifetime(key, cached_value, lifetime)
+                    cache.setWithLifetime(key, cached_value, lifetime, deps)
             return cached_value
         return replacement
     return decorator
