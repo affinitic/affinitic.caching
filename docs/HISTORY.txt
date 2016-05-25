@@ -4,6 +4,9 @@ Changelog
 0.6.2 (unreleased)
 ------------------
 
+- Add environment variable to set default cache lifetime
+  [jfroche]
+
 - Fix dependencies storage
   [jfroche]
 

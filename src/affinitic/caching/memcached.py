@@ -71,8 +71,9 @@ class MemcachedClientWithNameSpace(MemcachedClient):
 
 def memcachedClient():
     servers = os.environ.get("MEMCACHE_SERVER", "127.0.0.1:11211").split(",")
+    defaultAge = int(os.environ.get("MEMCACHE_DEFAULT_AGE", '86400'))
     return MemcachedClientWithNameSpace(servers, defaultNS=None,
-                                        defaultAge=86400)
+                                        defaultAge=defaultAge)
 
 
 class MemcacheAdapter(AbstractDict):
