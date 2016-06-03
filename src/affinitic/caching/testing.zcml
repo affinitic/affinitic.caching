@@ -6,7 +6,6 @@
   <include package="zope.component" file="configure.zcml" />
 
   <include package="zope.app.component" file="meta.zcml"/>
-  <include package="grokcore.component" file="meta.zcml"/>
   <include package="affinitic.caching"/>
 
   <includeOverrides package="affinitic.caching" file="overrides.zcml"/>

@@ -5,9 +5,6 @@
   <exclude package="zope.security"/>
   <exclude package="zope.app.cache"/>
 
-  <include package="z3c.autoinclude" file="meta.zcml" />
-  <includeDependencies package="." />
-
   <utility component=".memoize.invalidate_key"
            provides=".interfaces.IInvalidateKey" />
 
