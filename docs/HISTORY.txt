@@ -4,13 +4,8 @@ Changelog
 0.7.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
-
-0.8 (unreleased)
-----------------
-
-- Nothing changed yet.
+- Testing layer that avoids caching
+  [gotcha]
 
 
 0.7 (2016-06-03)
