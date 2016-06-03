@@ -82,7 +82,8 @@ class MemcacheAdapter(AbstractDict):
         self.client = client
 
     def _make_key(self, source):
-        return md5.new(source).hexdigest()
+        key = str(MEMCACHED_KEY_PREFIX) + md5.new(source).hexdigest()
+        return key
 
     def __getitem__(self, key):
         cached_value = self.client.query(self._make_key(key), raw=True)
@@ -125,6 +126,41 @@ class MemcacheAdapter(AbstractDict):
                         lifetime=lifetime,
                         dependencies=dependencies)
 
+IS_MEMCACHED_ACTIVE = True
+MEMCACHED_KEY_PREFIX = 0
+
+
+def get_memcached_usage():
+    return IS_MEMCACHED_ACTIVE
+
+
+def get_memcached_prefix():
+    return MEMCACHED_KEY_PREFIX
+
+
+def flush_memcached():
+    global MEMCACHED_KEY_PREFIX
+    MEMCACHED_KEY_PREFIX += 1
+
+
+def set_memcached_usage(value):
+    global IS_MEMCACHED_ACTIVE
+    IS_MEMCACHED_ACTIVE = value
+    if IS_MEMCACHED_ACTIVE:
+        flush_memcached()
+
+
+def activate_memcached_usage():
+    set_memcached_usage(True)
+
+
+def deactivate_memcached_usage():
+    set_memcached_usage(False)
+
+
+def toggle_memcached_usage():
+    set_memcached_usage(not IS_MEMCACHED_ACTIVE)
+
 
 def choose_cache(fun_name):
     client = queryUtility(IMemcachedClient)
@@ -143,6 +179,8 @@ def cache(get_key, dependencies=None, get_dependencies=None, lifetime=None):
     def decorator(fun):
 
         def replacement(*args, **kwargs):
+            if not IS_MEMCACHED_ACTIVE:
+                return fun(*args, **kwargs)
             try:
                 key = get_key(fun, *args, **kwargs)
             except volatile.DontCache:

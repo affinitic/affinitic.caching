@@ -1,13 +1,20 @@
 <configure xmlns="http://namespaces.zope.org/zope"
-           i18n_domain="cerise">
+             xmlns:browser="http://namespaces.zope.org/browser"
+           xmlns:zcml="http://namespaces.zope.org/zcml"
+           i18n_domain="affinitic.caching">
 
-  <include package="zope.app.component" file="meta.zcml" />
   <include package="zope.component" file="meta.zcml" />
   <include package="zope.component" file="configure.zcml" />
 
-  <include package="zope.app.component" file="meta.zcml"/>
+  <configure zcml:condition="installed zope.app.component">
+      <include package="zope.app.component" file="meta.zcml"/>
+  </configure>
+
   <include package="affinitic.caching"/>
 
   <includeOverrides package="affinitic.caching" file="overrides.zcml"/>
 
+  <configure zcml:condition="installed Products.Five">
+     <include file="views.zcml" />
+  </configure>
 </configure>

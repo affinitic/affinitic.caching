@@ -1,0 +1,14 @@
+<html>
+  <body>
+    <h1>Memcached usage</h1>
+    <p tal:condition="view/is_memcached_used">ACTIVE</p>
+    <p tal:condition="not:view/is_memcached_used">INACTIVE</p>
+    <p>Key prefix:<span tal:replace="view/memcached_prefix" /></p>
+    <p>
+      <form action="memcached_usage" method="GET">
+        <input type="submit" value="Refresh" />
+        <input type="submit" value="Toggle" name="toggle" />
+      </form>
+    </p>
+  </body>
+</html>
