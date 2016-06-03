@@ -4,7 +4,8 @@ Changelog
 0.6.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Enable/disable caching via python or browser view
+  [gotcha]
 
 
 0.6.2 (2016-05-25)
