@@ -1,9 +1,8 @@
 <configure xmlns="http://namespaces.zope.org/zope"
            i18n_domain="affinitic.caching">
 
-  <exclude package="lovely.memcached"/>
-  <exclude package="zope.security"/>
-  <exclude package="zope.app.cache"/>
+  <utility provides="lovely.memcached.interfaces.IMemcachedClient"
+          factory=".memcached.memcachedClient" />
 
   <utility component=".memoize.invalidate_key"
            provides=".interfaces.IInvalidateKey" />

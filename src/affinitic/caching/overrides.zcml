@@ -1,13 +1,8 @@
 <configure xmlns="http://namespaces.zope.org/zope"
            i18n_domain="affinitic.caching">
 
-  <utility provides="lovely.memcached.interfaces.IMemcachedClient"
-           factory=".memcached.memcachedClient" />
-
+   <include package="plone.memoize" />
    <utility component=".memcached.choose_cache"
             provides="plone.memoize.interfaces.ICacheChooser"/>
-
-   <utility component=".memcached.invalidate_key"
-            provides=".interfaces.IInvalidateKey" />
 
 </configure>
