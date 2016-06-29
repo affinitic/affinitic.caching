@@ -8,7 +8,5 @@
            provides=".interfaces.IInvalidateKey" />
 
   <subscriber handler="lovely.memcached.event.invalidateCache"/>
-  
-  <includeOverrides file="overrides.zcml" />
 
 </configure>
