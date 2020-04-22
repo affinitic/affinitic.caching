@@ -1,13 +1,15 @@
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      i18n:domain="affinitic.caching">
   <body>
-    <h1>Memcached usage</h1>
-    <p tal:condition="view/is_memcached_used">ACTIVE</p>
-    <p tal:condition="not:view/is_memcached_used">INACTIVE</p>
-    <p>Key prefix:<span tal:replace="view/memcached_prefix" /></p>
+    <h1 i18n:translate="">Memcached usage</h1>
+    <p tal:condition="view/is_memcached_used" i18n:translate="">ACTIVE</p>
+    <p tal:condition="not:view/is_memcached_used" i18n:translate="">INACTIVE</p>
+    <p i18n:translate="">Key prefix:<span tal:replace="view/memcached_prefix" i18n:name="memcached_prefix" /></p>
     <p>
       <form action="memcached_usage" method="GET">
-        <input type="submit" value="Refresh" />
-        <input type="submit" value="Toggle" name="toggle" />
+        <input type="submit" value="Refresh" i18n:attributes="value" />
+        <input type="submit" value="Toggle" i18n:attributes="value" name="toggle" />
       </form>
     </p>
   </body>
